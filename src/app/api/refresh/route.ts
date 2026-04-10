@@ -402,7 +402,14 @@ export async function POST() {
 
     return NextResponse.json({ success: true, categories: grouped });
   } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : String(error);
+    let errMsg: string;
+    if (error instanceof Error) {
+      errMsg = error.message;
+    } else if (typeof error === "object" && error !== null && "message" in error) {
+      errMsg = String((error as { message: unknown }).message);
+    } else {
+      errMsg = JSON.stringify(error);
+    }
     console.error(`========== REFRESH ERROR: ${errMsg} ==========\n`);
     return NextResponse.json(
       { success: false, error: errMsg },
