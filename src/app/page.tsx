@@ -274,9 +274,10 @@ export default function Home() {
       clearTimeout(timeout);
       const body = await res.json();
       if (!res.ok || body.success === false) {
-        setError(body.error === "rate_limit"
+        const errMsg = typeof body.error === "string" ? body.error : JSON.stringify(body.error);
+        setError(errMsg === "rate_limit"
           ? `Límite alcanzado. Intenta en ${body.retry_after || "unos minutos"}.`
-          : body.error || `Error (${res.status})`);
+          : errMsg || `Error (${res.status})`);
         setRefreshing(false); return;
       }
       const { data: freshNews } = await supabase
